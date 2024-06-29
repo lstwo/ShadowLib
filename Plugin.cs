@@ -7,7 +7,9 @@ namespace ShadowLib
     {
         private void Awake()
         {
-            // Plugin startup logic
+            GameInstance.onAssignedPlayerController += PlayerUtils.OnAssignedPlayerController;
+            GameInstance.onUnassignedPlayerController += PlayerUtils.OnUnassignedPlayerController;
+
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
     }

@@ -1,0 +1,27 @@
+﻿using HarmonyLib;
+using System;
+
+namespace ShadowLib
+{
+    public class QuickHarmony
+    {
+        private string baseId;
+
+        public QuickHarmony(string baseId)
+        {
+            this.baseId = baseId;
+        }
+
+        public Harmony Init(Type type, string id)
+        {
+            var h = new Harmony(baseId + "." + id);
+            h.PatchAll(type);
+            return h;
+        }
+
+        public Harmony Init(Type type)
+        {
+            return Init(type, nameof(type));
+        }
+    }
+}
