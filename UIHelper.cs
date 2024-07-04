@@ -76,8 +76,32 @@ namespace ShadowLib
 
         public Slider CreateSlider(string name)
         {
-            UIFactory.CreateSlider(root, name, out var slider);
+            var obj = UIFactory.CreateSlider(root, name, out var slider);
+            UIFactory.SetLayoutElement(obj, 25, 25, 9999);
             return slider;
         }
-    }
+
+        public GameObject CreateGridGroup(string name, Vector2 cellSize, Vector2 spacing, Color bgColor = default)
+        {
+            var obj = UIFactory.CreateGridGroup(root, name, cellSize, spacing, bgColor);
+            UIFactory.SetLayoutElement(obj, 25, 25, 999);
+            return obj;
+        }
+
+        public GameObject CreateHorizontalGroup(string name, bool forceExpandWidth, bool forceExpandHeight, bool childControlWidth, bool childControlHeight, int spacing = 0, Vector4 padding = default, 
+            Color bgColor = default, TextAnchor? childAlignment = null)
+        {
+            var obj = UIFactory.CreateHorizontalGroup(root, name, forceExpandWidth, forceExpandHeight, childControlWidth, childControlHeight, spacing, padding, bgColor, childAlignment);
+            UIFactory.SetLayoutElement(obj, 25, 25, 9999);
+            return obj;
+        }
+
+        public GameObject CreateVerticalGroup(string name, bool forceExpandWidth, bool forceExpandHeight, bool childControlWidth, bool childControlHeight, int spacing = 0, Vector4 padding = default,
+            Color bgColor = default, TextAnchor? childAlignment = null)
+        {
+            var obj = UIFactory.CreateVerticalGroup(root, name, forceExpandWidth, forceExpandHeight, childControlWidth, childControlHeight, spacing, padding, bgColor, childAlignment);
+            UIFactory.SetLayoutElement(obj, 25, 25, 9999);
+            return obj;
+        }
+    } 
 }
