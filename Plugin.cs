@@ -16,12 +16,11 @@ namespace ShadowLib
             GameInstance.onAssignedPlayerController += PlayerUtils.OnAssignedPlayerController;
             GameInstance.onUnassignedPlayerController += PlayerUtils.OnUnassignedPlayerController;
 
-            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
-        }
+            var logManager = new GameObject("ChatLogManager");
+            DontDestroyOnLoad(logManager);
+            logManager.AddComponent<ChatLogManager>().Init();
 
-        private void Start()
-        {
-            ChatLogManager.Init();
+            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
     }
 }

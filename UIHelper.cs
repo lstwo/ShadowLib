@@ -70,8 +70,14 @@ namespace ShadowLib
 
         public void AddSpacer(int height)
         {
-            GameObject obj = UIFactory.CreateUIObject("Spacer", root);
+            var obj = UIFactory.CreateUIObject("Spacer", root);
             UIFactory.SetLayoutElement(obj, minHeight: height, flexibleHeight: 0);
+        }
+
+        public Slider CreateSlider(string name)
+        {
+            UIFactory.CreateSlider(root, name, out var slider);
+            return slider;
         }
     }
 }
