@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System;
 using System.Reflection;
 
 namespace ShadowLib
@@ -21,7 +22,7 @@ namespace ShadowLib
 
         public object GetMethod(string method, params object[] args)
         {
-            return GetMethod(instance, method, args);
+            return GetMethod(instance, method, flags, args);
         }
 
         public void SetField(string field, object value)
@@ -32,19 +33,19 @@ namespace ShadowLib
 
         public static object GetField(object instance, BindingFlags flags, string field)
         {
-            var info = instance.GetType().GetField(field, flags);
+            var info = typeof(T).GetField(field, flags);
             return info.GetValue(instance);
         }
 
-        public static object GetMethod(object instance, string method, params object[] args)
+        public static object GetMethod(object instance, string method, BindingFlags flags = default, params object[] args)
         {
-            var info = Traverse.Create(instance).Method(method, args);
-            return info.GetValue(args);
+            var info = typeof(T).GetMethod(method, flags);
+            return info.Invoke(instance, args);
         }
 
         public static void SetField(object instance, BindingFlags flags, string field, object value)
         {
-            var info = instance.GetType().GetField(field, flags);
+            var info = typeof(T).GetField(field, flags);
             info.SetValue(instance, value);
         }
     }
