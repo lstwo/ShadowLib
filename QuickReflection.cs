@@ -3,15 +3,15 @@ using System.Reflection;
 
 namespace ShadowLib
 {
-    public class QuickReflection
+    public class QuickReflection<T>
     {
-        public object instance;
+        public T instance;
         public BindingFlags flags;
 
-        public QuickReflection(object instance, BindingFlags flags)
+        public QuickReflection(T instance, BindingFlags flags)
         {
-            this.instance=instance;
-            this.flags=flags;
+            this.instance = instance;
+            this.flags = flags;
         }
 
         public object GetField(string field)
