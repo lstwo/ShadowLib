@@ -36,10 +36,9 @@ namespace ShadowLib
 
         public ButtonRef CreateButton(string text, Action onClick, string name = "", Color? color = null)
         {
-            if (color == null) color = Color.white;
             if (name == "") name = text;
 
-            var button = UIFactory.CreateButton(root, name, text, (Color)color);
+            var button = UIFactory.CreateButton(root, name, text, color);
             button.OnClick = onClick;
             UIFactory.SetLayoutElement(button.GameObject, 25, 25, 9999);
 
