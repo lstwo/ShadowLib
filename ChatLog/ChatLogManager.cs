@@ -1,11 +1,12 @@
 ﻿using HawkNetworking;
 using ShadowLib;
+using ShadowLib.Networking;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace ShadowLib.ChatLog
 {
-    public class ChatLogManager : HawkNetworkBehaviour
+    public class ChatLogManager : ShadowNetworkBehaviour
     {
         public static GameObject canvas;
         public static GameObject chatLogRoot;
@@ -26,8 +27,10 @@ namespace ShadowLib.ChatLog
             RPC_CLIENT_RECEIVE_MESSAGE = networkObject.RegisterRPC(ClientReceiveLogMessage);
         }
 
-        internal void Init()
+        protected override void Awake()
         {
+            base.Awake();
+
             if (_instance == null) _instance = this;
             else Destroy(gameObject);
 
@@ -40,8 +43,13 @@ namespace ShadowLib.ChatLog
 
         public void ServerSendLogMessage(string text, Color textColor)
         {
-            Debug.Log(RPC_CLIENT_RECEIVE_MESSAGE);
-            networkObject.SendRPC(RPC_CLIENT_RECEIVE_MESSAGE, RPCRecievers.All, text, textColor);
+            if (networkObject != null)
+            {
+                networkObject.SendRPC(RPC_CLIENT_RECEIVE_MESSAGE, RPCRecievers.All, text, textColor);
+            } else
+            {
+                Debug.LogWarning("can't send log message; either not in active lobby or network object is null!");
+            }
         }
 
         public void ServerSendLogMessage(string text)

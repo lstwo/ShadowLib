@@ -2,10 +2,11 @@
 using UnityEngine.Diagnostics;
 using UnityEngine;
 using ShadowLib.ChatLog;
+using ShadowLib.Networking;
 
 namespace ShadowLib
 {
-    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin("lstwo.shadowlib", PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
     {
         public static AssetBundle bundle { get; private set; }
@@ -16,11 +17,12 @@ namespace ShadowLib
             GameInstance.onAssignedPlayerController += PlayerUtils.OnAssignedPlayerController;
             GameInstance.onUnassignedPlayerController += PlayerUtils.OnUnassignedPlayerController;
 
-            var logManager = new GameObject("ChatLogManager");
-            DontDestroyOnLoad(logManager);
-            logManager.AddComponent<ChatLogManager>().Init();
+            gameObject.AddComponent<ChatLogManager>();
 
-            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+            QuickHarmony h = new("lstwo.shadowlib");
+            h.Init(typeof(HawkNetworkManagerPatch));
+
+            Logger.LogInfo($"Plugin \"lstwo.shadowlib\" is loaded!");
         }
     }
 }
