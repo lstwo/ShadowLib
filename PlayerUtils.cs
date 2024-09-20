@@ -46,6 +46,7 @@ namespace ShadowLib
             {
                 if(player.networkObject.IsOwner())
                 {
+                    Debug.Log("found my player");
                     return player;
                 }
             }
@@ -65,6 +66,7 @@ namespace ShadowLib
             {
                 if (player.networkObject.IsServer())
                 {
+                    Debug.Log("found host player");
                     return player;
                 }
             }

@@ -31,19 +31,19 @@ namespace ShadowLib
         }
 
 
-        public static object GetField(object instance, BindingFlags flags, string field)
+        public static object GetField(T instance, BindingFlags flags, string field)
         {
             var info = typeof(T).GetField(field, flags);
             return info.GetValue(instance);
         }
 
-        public static object GetMethod(object instance, string method, BindingFlags flags = default, params object[] args)
+        public static object GetMethod(T instance, string method, BindingFlags flags = default, params object[] args)
         {
             var info = typeof(T).GetMethod(method, flags);
             return info.Invoke(instance, args);
         }
 
-        public static void SetField(object instance, BindingFlags flags, string field, object value)
+        public static void SetField(T instance, BindingFlags flags, string field, object value)
         {
             var info = typeof(T).GetField(field, flags);
             info.SetValue(instance, value);

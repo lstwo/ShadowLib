@@ -10,7 +10,7 @@ namespace ShadowLib.ChatLog
 
         public void Start()
         {
-            
+            StartCoroutine(destroy());
         }
 
         public IEnumerator destroy()

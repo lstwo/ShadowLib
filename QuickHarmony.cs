@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System;
+using UnityEngine;
 
 namespace ShadowLib
 {
@@ -21,7 +22,7 @@ namespace ShadowLib
 
         public Harmony Init(Type type)
         {
-            return Init(type, nameof(type));
+            return Init(type, type.GetType().Name);
         }
     }
 }

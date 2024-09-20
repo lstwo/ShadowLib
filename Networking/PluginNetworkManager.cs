@@ -32,6 +32,19 @@ namespace ShadowLib.Networking
         {
             return moddedNetworkBehaviours;
         }
+
+        /// <summary>
+        /// NOTE: This will NOT Register them! This only ADDS them to the current HawkProcessSceneNetworkBehaviours Instance!!!
+        /// </summary>
+        public static void RegisterAllBehaviors()
+        {
+            foreach(var behaviour in moddedNetworkBehaviours)
+            {
+                if (currentHawkProcess.GetBehaviours().Contains(behaviour)) continue;
+
+                currentHawkProcess.GetBehaviours().Add(behaviour);
+            }
+        }
     }
 
     public static class HawkNetworkManagerPatch
@@ -40,78 +53,21 @@ namespace ShadowLib.Networking
         [HarmonyPrefix]
         public static bool InitializeScenePrefix(ref HawkNetworkManager __instance, ref Scene scene, ref LoadSceneMode loadMode)
         {
-            // Getting private fields
-
-            var qr = new QuickReflection<HawkNetworkManager>(__instance, BindingFlags.Instance | BindingFlags.NonPublic);
-
-            List<GameObject> rootGameObjectsCache = (List<GameObject>)qr.GetField("rootGameObjectsCache");
-            int registerInstanceid = (int)qr.GetField("registerInstanceid");
-            List<KeyValuePair<int, int>> registeringSceneBehavioursInstances = (List<KeyValuePair<int, int>>)qr.GetField("registeringSceneBehavioursInstances");
-            List<HawkNetworkBehaviour> sceneLoadBehavioursAllCache = (List<HawkNetworkBehaviour>)qr.GetField("sceneLoadBehavioursAllCache");
-            List<HawkNetworkBehaviour> sceneLoadBehavioursCache = (List<HawkNetworkBehaviour>)qr.GetField("sceneLoadBehavioursCache");
-
-            // Original Code
-
-            Action<Scene, LoadSceneMode> action = __instance.onPreInitalizeScene;
-            if (action != null)
+            if(loadMode == LoadSceneMode.Single)
             {
-                action(scene, loadMode);
-            }
-            rootGameObjectsCache.Clear();
-            scene.GetRootGameObjects(rootGameObjectsCache);
-            bool flag = false;
-            for (int i = rootGameObjectsCache.Count - 1; i >= 0; i--)
-            {
-                if (rootGameObjectsCache[i].TryGetComponent<HawkProcessSceneNetworkBehaviours>(out var hawkProcessSceneNetworkBehaviours))
+                foreach(var obj in scene.GetRootGameObjects())
                 {
-                    // Modded Code
-                    PluginNetworkManager.currentHawkProcess = hawkProcessSceneNetworkBehaviours;
-
-                    List<HawkNetworkBehaviour> networkBehaviours = (List<HawkNetworkBehaviour>)QuickReflection<HawkProcessSceneNetworkBehaviours>.GetField(hawkProcessSceneNetworkBehaviours,
-                        BindingFlags.Instance | BindingFlags.NonPublic, "behaviours");
-
-                    foreach (HawkNetworkBehaviour behaviour in PluginNetworkManager.GetNetworkBehaviours())
+                    if(obj.TryGetComponent<HawkProcessSceneNetworkBehaviours>(out var hawkProcessSceneNetworkBehaviours))
                     {
-                        if (networkBehaviours.Contains(behaviour)) continue;
-                        networkBehaviours.Add(behaviour);
+                        hawkProcessSceneNetworkBehaviours = obj.GetComponent<HawkProcessSceneNetworkBehaviours>();
+                        PluginNetworkManager.currentHawkProcess = hawkProcessSceneNetworkBehaviours;
+                        PluginNetworkManager.RegisterAllBehaviors();
+                        break;
                     }
-
-                    QuickReflection<HawkProcessSceneNetworkBehaviours>.SetField(hawkProcessSceneNetworkBehaviours,
-                        BindingFlags.Instance | BindingFlags.NonPublic, "behaviours", networkBehaviours);
-
-                    // Original Code
-                    flag = true;
-                    int num = registerInstanceid;
-                    registerInstanceid = num + 1;
-                    int num2 = num;
-                    registeringSceneBehavioursInstances.Add(new KeyValuePair<int, int>(scene.path.GetHashCode(), num2));
-                    __instance.StartCoroutine((IEnumerator)qr.GetMethod("RegisterSceneNetworkBehavioursBatch", hawkProcessSceneNetworkBehaviours.GetBehaviours(), scene.path.GetHashCode(), new int?(num2),
-                        hawkProcessSceneNetworkBehaviours));
-                    break;
                 }
             }
-            if (!flag)
-            {
-                sceneLoadBehavioursAllCache.Clear();
-                for (int j = 0; j < rootGameObjectsCache.Count; j++)
-                {
-                    GameObject gameObject = rootGameObjectsCache[j];
-                    sceneLoadBehavioursCache.Clear();
-                    gameObject.GetComponentsInChildren(true, sceneLoadBehavioursCache);
-                    sceneLoadBehavioursAllCache.AddRange(sceneLoadBehavioursCache);
-                }
-                qr.GetMethod("RegisterNetworkBehaviours", scene, sceneLoadBehavioursAllCache);
-            }
 
-            // Setting private fields
-
-            qr.SetField("rootGameObjectsCache", rootGameObjectsCache);
-            qr.SetField("registerInstanceid", registerInstanceid);
-            qr.SetField("registeringSceneBehavioursInstances", registeringSceneBehavioursInstances);
-            qr.SetField("sceneLoadBehavioursAllCache", sceneLoadBehavioursAllCache);
-            qr.SetField("sceneLoadBehavioursCache", sceneLoadBehavioursCache);
-
-            return false;
+            return true;
         }
     }
 }

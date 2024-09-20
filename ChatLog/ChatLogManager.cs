@@ -1,6 +1,7 @@
 ﻿using HawkNetworking;
 using ShadowLib;
 using ShadowLib.Networking;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,12 +20,14 @@ namespace ShadowLib.ChatLog
         public static ChatLogManager Instance { get { return _instance; } }
 
         private byte RPC_CLIENT_RECEIVE_MESSAGE;
+        private byte RPC_CLIENT_RECEIVE_PRIVATE_MESSAGE;
 
         protected override void RegisterRPCs(HawkNetworkObject networkObject)
         {
             base.RegisterRPCs(networkObject);
 
             RPC_CLIENT_RECEIVE_MESSAGE = networkObject.RegisterRPC(ClientReceiveLogMessage);
+            RPC_CLIENT_RECEIVE_PRIVATE_MESSAGE = networkObject.RegisterRPC(ClientReceivePrivateLogMessage);
         }
 
         protected override void Awake()
@@ -52,15 +55,47 @@ namespace ShadowLib.ChatLog
             }
         }
 
+        public void ServerSendPrivateLogMessage(string text, PlayerController receiver, Color textColor)
+        {
+            if (networkObject != null)
+            {
+                networkObject.SendRPC(RPC_CLIENT_RECEIVE_PRIVATE_MESSAGE, RPCRecievers.Others, text, textColor, (Int32)receiver.networkObject.GetNetworkID());
+            }
+            else
+            {
+                Debug.LogWarning("can't send log message; either not in active lobby or network object is null!");
+            }
+        }
+
         public void ServerSendLogMessage(string text)
         {
             ServerSendLogMessage(text, Color.white);
+        }
+
+        public void ServerSendPrivateLogMessage(string text, PlayerController receiver)
+        {
+            ServerSendPrivateLogMessage(text, receiver, Color.white);
         }
 
         private void ClientReceiveLogMessage(HawkNetReader reader, HawkRPCInfo info)
         {
             var text = reader.ReadString();
             var textColor = reader.ReadColor();
+
+            ClientSendLogMessage(text, textColor);
+        }
+
+        private void ClientReceivePrivateLogMessage(HawkNetReader reader, HawkRPCInfo info)
+        {
+            if(reader.ReadInt32() == PlayerUtils.GetMyPlayer().networkObject.GetNetworkID())
+            {
+                ClientReceiveLogMessage(reader, info);
+            }
+        }
+
+        public void ClientSendLogMessage(string text, Color textColor)
+        {
+            Plugin.LogSource.LogMessage(text);
 
             var itemObj = Instantiate(chatLogItem);
             DontDestroyOnLoad(itemObj);
@@ -71,6 +106,11 @@ namespace ShadowLib.ChatLog
 
             item.text.text = text;
             item.text.color = textColor;
+        }
+
+        public void ClientSendLogMessage(string text)
+        {
+            ClientSendLogMessage(text, Color.white);
         }
     }
 }   
