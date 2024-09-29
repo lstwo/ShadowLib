@@ -42,6 +42,7 @@ namespace ShadowLib.Networking
             {
                 if (currentHawkProcess.GetBehaviours().Contains(behaviour)) continue;
 
+                Plugin.LogSource.LogMessage($"Registering behavior {behaviour}");
                 currentHawkProcess.GetBehaviours().Add(behaviour);
             }
         }

@@ -59,7 +59,7 @@ namespace ShadowLib.ChatLog
         {
             if (networkObject != null)
             {
-                networkObject.SendRPC(RPC_CLIENT_RECEIVE_PRIVATE_MESSAGE, RPCRecievers.Others, text, textColor, (Int32)receiver.networkObject.GetNetworkID());
+                networkObject.SendRPC(RPC_CLIENT_RECEIVE_PRIVATE_MESSAGE, receiver.networkObject.GetOwner(), text, textColor, (Int32)receiver.networkObject.GetNetworkID());
             }
             else
             {
