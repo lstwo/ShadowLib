@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace ShadowLib.ChatLog
 {
-    public class ChatLogManager : ShadowNetworkBehaviour
+    public class ChatLogManager : ShadowNetworkSingleton
     {
         public static GameObject canvas;
         public static GameObject chatLogRoot;
@@ -34,8 +34,7 @@ namespace ShadowLib.ChatLog
         {
             base.Awake();
 
-            if (_instance == null) _instance = this;
-            else Destroy(gameObject);
+            _instance = this;
 
             canvasPrefab = Plugin.bundle.LoadAsset<GameObject>("ChatLogCanvas");
             canvas = Instantiate(canvasPrefab);
