@@ -40,7 +40,9 @@ namespace ShadowLib.Networking
         {
             foreach(var behaviour in moddedNetworkBehaviours)
             {
-                if (currentHawkProcess.GetBehaviours().Contains(behaviour)) continue;
+                if (currentHawkProcess.GetBehaviours().Contains(behaviour) || behaviour == null) continue;
+
+                if (behaviour.networkObject != null) continue;
 
                 Plugin.LogSource.LogMessage($"Registering behavior {behaviour}");
                 currentHawkProcess.GetBehaviours().Add(behaviour);
@@ -54,17 +56,14 @@ namespace ShadowLib.Networking
         [HarmonyPrefix]
         public static bool InitializeScenePrefix(ref HawkNetworkManager __instance, ref Scene scene, ref LoadSceneMode loadMode)
         {
-            if(loadMode == LoadSceneMode.Single)
+            foreach(var obj in scene.GetRootGameObjects())
             {
-                foreach(var obj in scene.GetRootGameObjects())
+                if(obj.TryGetComponent<HawkProcessSceneNetworkBehaviours>(out var hawkProcessSceneNetworkBehaviours))
                 {
-                    if(obj.TryGetComponent<HawkProcessSceneNetworkBehaviours>(out var hawkProcessSceneNetworkBehaviours))
-                    {
-                        hawkProcessSceneNetworkBehaviours = obj.GetComponent<HawkProcessSceneNetworkBehaviours>();
-                        PluginNetworkManager.currentHawkProcess = hawkProcessSceneNetworkBehaviours;
-                        PluginNetworkManager.RegisterAllBehaviors();
-                        break;
-                    }
+                    hawkProcessSceneNetworkBehaviours = obj.GetComponent<HawkProcessSceneNetworkBehaviours>();
+                    PluginNetworkManager.currentHawkProcess = hawkProcessSceneNetworkBehaviours;
+                    PluginNetworkManager.RegisterAllBehaviors();
+                    break;
                 }
             }
 

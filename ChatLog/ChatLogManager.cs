@@ -48,7 +48,8 @@ namespace ShadowLib.ChatLog
             if (networkObject != null)
             {
                 networkObject.SendRPC(RPC_CLIENT_RECEIVE_MESSAGE, RPCRecievers.All, text, textColor);
-            } else
+            } 
+            else
             {
                 Debug.LogWarning("can't send log message; either not in active lobby or network object is null!");
             }
