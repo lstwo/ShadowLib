@@ -16,7 +16,7 @@ namespace ShadowLib.Networking
     {
         public static HawkProcessSceneNetworkBehaviours currentHawkProcess;
 
-        private static List<HawkNetworkBehaviour> moddedNetworkBehaviours = new();
+        private static readonly List<HawkNetworkBehaviour> moddedNetworkBehaviours = new();
 
         public static void AddNetworkBehaviour(HawkNetworkBehaviour networkBehaviour)
         {
@@ -33,19 +33,22 @@ namespace ShadowLib.Networking
             return moddedNetworkBehaviours;
         }
 
-        /// <summary>
-        /// NOTE: This will NOT Register them! This only ADDS them to the current HawkProcessSceneNetworkBehaviours Instance!!!
-        /// </summary>
-        public static void RegisterAllBehaviors()
+        internal static void RegisterAllBehaviors()
         {
-            foreach(var behaviour in moddedNetworkBehaviours)
-            {
-                if (currentHawkProcess.GetBehaviours().Contains(behaviour) || behaviour == null) continue;
+            var behaviors = moddedNetworkBehaviours.ToList();
 
-                if (behaviour.networkObject != null) continue;
+            foreach(var behaviour in behaviors)
+            {
+                if (currentHawkProcess.GetBehaviours().Contains(behaviour) || behaviour == null || behaviour.networkObject != null)
+                {
+                    moddedNetworkBehaviours.Remove(behaviour);
+                    continue;
+                }
 
                 Plugin.LogSource.LogMessage($"Registering behavior {behaviour}");
                 currentHawkProcess.GetBehaviours().Add(behaviour);
+
+                moddedNetworkBehaviours.Remove(behaviour);
             }
         }
     }
@@ -60,7 +63,6 @@ namespace ShadowLib.Networking
             {
                 if(obj.TryGetComponent<HawkProcessSceneNetworkBehaviours>(out var hawkProcessSceneNetworkBehaviours))
                 {
-                    hawkProcessSceneNetworkBehaviours = obj.GetComponent<HawkProcessSceneNetworkBehaviours>();
                     PluginNetworkManager.currentHawkProcess = hawkProcessSceneNetworkBehaviours;
                     PluginNetworkManager.RegisterAllBehaviors();
                     break;

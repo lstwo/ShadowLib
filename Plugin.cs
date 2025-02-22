@@ -38,7 +38,7 @@ namespace ShadowLib
                 {
                     foreach (Type type in NetworkBehaviours)
                     {
-                        var obj = new GameObject();
+                        var obj = new GameObject(type.FullName);
                         SceneManager.MoveGameObjectToScene(obj, scene);
                         obj.AddComponent(type);
                     }
@@ -53,33 +53,23 @@ namespace ShadowLib
             NetworkBehaviours = GetAllInheritingTypes<ShadowNetworkSingleton>();
         }
 
-        /// <summary>
-        /// Gets all types that inherit from a specified parent type across all loaded assemblies.
-        /// </summary>
-        /// <typeparam name="TParent">The parent type to search for inheritors.</typeparam>
-        /// <returns>A list of types that inherit from the specified parent type.</returns>
         public static List<Type> GetAllInheritingTypes<TParent>()
         {
             var parentType = typeof(TParent);
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-            // Iterate through each assembly and search for types that inherit from the parent type.
             var derivedTypes = new List<Type>();
+
             foreach (var assembly in loadedAssemblies)
             {
                 try
                 {
-                    // Get all types in the assembly
-                    var types = assembly.GetTypes()
-                        .Where(type => type.IsClass && !type.IsAbstract && parentType.IsAssignableFrom(type));
-
+                    var types = assembly.GetTypes().Where(type => type.IsClass && !type.IsAbstract && parentType.IsAssignableFrom(type) && type != typeof(ShadowNetworkBehaviour));
                     derivedTypes.AddRange(types);
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
-                    // Handle types that couldn't be loaded
-                    var types = ex.Types
-                        .Where(type => type != null && type.IsClass && !type.IsAbstract && parentType.IsAssignableFrom(type));
+                    var types = ex.Types.Where(type => type != null && type.IsClass && !type.IsAbstract && parentType.IsAssignableFrom(type) && type != typeof(ShadowNetworkBehaviour));
                     derivedTypes.AddRange(types);
                 }
             }

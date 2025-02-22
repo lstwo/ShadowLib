@@ -13,7 +13,7 @@ namespace ShadowLib
         {
             try
             {
-                SteamId id = ((SteamConnection)controller.networkObject.GetOwner()).steamId;
+                var id = ((SteamConnection)controller.networkObject.GetOwner()).steamId;
                 steamIds.Add(controller, id);
             }
             catch (Exception e)
@@ -82,7 +82,7 @@ namespace ShadowLib
                 return null;
             }
 
-            int num = UnityEngine.Random.RandomRangeInt(0, GameInstance.Instance.GetPlayerControllers().Count);
+            var num = UnityEngine.Random.RandomRangeInt(0, GameInstance.Instance.GetPlayerControllers().Count);
 
             return GameInstance.Instance.GetPlayerControllers()[num];
         }
