@@ -34,15 +34,7 @@ namespace ShadowLib
 
             SceneManager.sceneLoaded += (scene, loadMode) =>
             {
-                if(loadMode == LoadSceneMode.Single)
-                {
-                    foreach (Type type in NetworkBehaviours)
-                    {
-                        var obj = new GameObject(type.FullName);
-                        SceneManager.MoveGameObjectToScene(obj, scene);
-                        obj.AddComponent(type);
-                    }
-                }
+                
             };
 
             Logger.LogInfo($"Plugin \"lstwo.shadowlib\" is loaded!");

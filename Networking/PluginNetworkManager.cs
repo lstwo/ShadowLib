@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -15,12 +16,18 @@ namespace ShadowLib.Networking
     public static class PluginNetworkManager
     {
         public static HawkProcessSceneNetworkBehaviours currentHawkProcess;
+        public static Action onRegisteredCallback;
 
         private static readonly List<HawkNetworkBehaviour> moddedNetworkBehaviours = new();
 
-        public static void AddNetworkBehaviour(HawkNetworkBehaviour networkBehaviour)
+        public static void AddNetworkBehaviour(HawkNetworkBehaviour networkBehaviour, Action onRegisteredCallback = null)
         {
             moddedNetworkBehaviours.Add(networkBehaviour);
+
+            if(onRegisteredCallback != null)
+            {
+                PluginNetworkManager.onRegisteredCallback += onRegisteredCallback;
+            }
         }
 
         public static void RemoveNetworkBehaviour(HawkNetworkBehaviour networkBehaviour)
@@ -59,7 +66,17 @@ namespace ShadowLib.Networking
         [HarmonyPrefix]
         public static bool InitializeScenePrefix(ref HawkNetworkManager __instance, ref Scene scene, ref LoadSceneMode loadMode)
         {
-            foreach(var obj in scene.GetRootGameObjects())
+            if (loadMode == LoadSceneMode.Single)
+            {
+                foreach (Type type in Plugin.NetworkBehaviours)
+                {
+                    var obj = new GameObject(type.FullName);
+                    SceneManager.MoveGameObjectToScene(obj, scene);
+                    obj.AddComponent(type);
+                }
+            }
+
+            foreach (var obj in scene.GetRootGameObjects())
             {
                 if(obj.TryGetComponent<HawkProcessSceneNetworkBehaviours>(out var hawkProcessSceneNetworkBehaviours))
                 {
@@ -70,6 +87,14 @@ namespace ShadowLib.Networking
             }
 
             return true;
+        }
+
+        [HarmonyPatch(typeof(HawkNetworkManager), "InitalizeScene")]
+        [HarmonyPostfix]
+        public static void InitializeScenePostfix(Scene scene, LoadSceneMode loadMode)
+        {
+            PluginNetworkManager.onRegisteredCallback?.Invoke();
+            PluginNetworkManager.onRegisteredCallback = null;
         }
     }
 }
