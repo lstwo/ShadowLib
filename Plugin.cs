@@ -1,11 +1,8 @@
 ﻿using BepInEx;
-using UnityEngine.Diagnostics;
 using UnityEngine;
-using ShadowLib.ChatLog;
 using ShadowLib.Networking;
 using BepInEx.Logging;
 using UnityEngine.SceneManagement;
-using System.CodeDom;
 using System;
 using System.Reflection;
 using System.Collections.Generic;

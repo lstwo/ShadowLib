@@ -1,5 +1,4 @@
 ﻿using HawkNetworking;
-using ShadowLib;
 using ShadowLib.Networking;
 using System;
 using UnityEngine;
