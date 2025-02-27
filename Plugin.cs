@@ -21,8 +21,8 @@ namespace ShadowLib
         private void Awake()
         {
             LogSource = Logger;
-
-            bundle = AssetUtils.LoadAssetBundleFromPluginsFolder("lstwo.shadowlib");
+            bundle = AssetUtils.LoadFromEmbeddedResources("ShadowLib.Resources.assets.bundle");
+            
             GameInstance.onAssignedPlayerController += PlayerUtils.OnAssignedPlayerController;
             GameInstance.onUnassignedPlayerController += PlayerUtils.OnUnassignedPlayerController;
 
